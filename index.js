@@ -1,10 +1,23 @@
 import { schools } from "./db/schema.js";
 import express from "express";
 import morgan from "morgan";
+import mysql from "mysql2/promise";
+import { drizzle } from "drizzle-orm/mysql2";
 
 const app = express();
 
 app.use(morgan("dev"));
+
+const connection = await mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: Number(process.env.DB_PORT) || 3306,
+  ssl: { rejectUnauthorized: false }, // Required for Aiven
+});
+
+const db = drizzle(connection);
 
 app.post("/addSchool", async (req, res) => {
   const { name, address, longitude, latitude } = req.body;
