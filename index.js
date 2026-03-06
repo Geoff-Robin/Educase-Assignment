@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { schools } from "./db/schema.js";
 import express from "express";
 import morgan from "morgan";
