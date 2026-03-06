@@ -66,15 +66,15 @@ app.get("/listSchools", async (req, res) => {
   try {
     const { latitude, longitude } = req.query;
     if (!latitude || !longitude) {
-      const schools = await db.select().from(schools);
+      const school_list = await db.select().from(schools);
       res.status(200).json({
         success: true,
         data: schools,
       });
       return;
     }
-    const schools = await db.select().from(schools);
-    const distances = schools.map((school) => {
+    const school_list = await db.select().from(schools);
+    const distances = school_list.map((school) => {
       const { longitude: schoolLongitude, latitude: schoolLatitude } = school;
       return {
         ...school,
