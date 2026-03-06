@@ -7,6 +7,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 const app = express();
 
 app.use(morgan("dev"));
+app.use(express.json());
 
 const connection = await mysql.createConnection({
   host: process.env.DB_HOST,
@@ -20,7 +21,9 @@ const connection = await mysql.createConnection({
 const db = drizzle(connection);
 
 app.post("/addSchool", async (req, res) => {
-  const { name, address, longitude, latitude } = req.body;
+  let { name, address, longitude, latitude } = req.body;
+  latitude = parseFloat(latitude);
+  longitude = parseFloat(longitude);
   const errors = [];
 
   if (typeof name !== "string" || name.trim() === "") {
@@ -64,15 +67,17 @@ app.post("/addSchool", async (req, res) => {
 
 app.get("/listSchools", async (req, res) => {
   try {
-    const { latitude, longitude } = req.query;
+    let { latitude, longitude } = req.query;
     if (!latitude || !longitude) {
       const school_list = await db.select().from(schools);
       res.status(200).json({
         success: true,
-        data: schools,
+        data: school_list,
       });
       return;
     }
+    latitude = parseFloat(latitude);
+    longitude = parseFloat(longitude);
     const school_list = await db.select().from(schools);
     const distances = school_list.map((school) => {
       const { longitude: schoolLongitude, latitude: schoolLatitude } = school;
